@@ -26,7 +26,7 @@ BLUE = "#1E3A8A"
 # ===== DADOS =====
 def carregar_counters():
     try:
-        caminho = resource_path("lolcounters.json")
+        caminho = resource_path("data/lolcounters.json")
 
         with open(caminho, "r", encoding="utf-8") as f:
             dados = json.load(f)

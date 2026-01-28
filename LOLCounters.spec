@@ -6,7 +6,7 @@ a = Analysis(
     ['LOLCounters.py'],
     pathex=[],
     binaries=[],
-    datas=[('icon.ico', '.')],
+    datas=[('icon.ico', '.'), ('data/lolcounters.json', 'data')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
