@@ -77,22 +77,35 @@ def buscar_campeao(nome_digitado):
     nome_digitado = nome_digitado.lower().strip()
     list_resultado.delete(0, "end")
 
-    for item in counters:
-        nome_json = item["Campeão"].split("\n")[0].lower()
+    for counter in counters:
+        nome_json = counter["Campeão"].split("\n")[0].lower()
+        print( nome_json, nome_digitado )
 
         if nome_json == nome_digitado:
-            lista_counters = item.get("Counters", [])
-
-            for counter in lista_counters:
-                nome = counter["Campeão"]
-                winrate = counter["Win Rate"]
-
-                texto = f"{nome} - Win Rate: {winrate}%"
-
-                list_resultado.insert("end", texto)
+            lista_counters = counter.get("Counters", [])
+            filtrar_lane(lista_counters)
             return
-
     return list_resultado.insert("end", "Campeão não encontrado.")
+
+def filtrar_lane(lista_counters):
+    lane_selecionada = combo_lane.get()
+    lista_counters_filtrada = []
+    for counter in lista_counters:
+        if counter.get("Lane") == lane_selecionada:
+            lista_counters_filtrada.append(counter)
+    mostrar_counters(lista_counters_filtrada)
+
+
+def mostrar_counters(lista_counters_filtrada):
+    list_resultado.delete(0, "end")
+    for counter in lista_counters_filtrada:
+        nome = counter["Campeão"]
+        winrate = counter["Win Rate"]
+
+        texto = f"{nome} - Win Rate: {winrate}%"
+
+        list_resultado.insert("end", texto)
+
 
 def atualizar_autocomplete(event=None):
     texto = entry_campeao.get().lower()
@@ -108,14 +121,20 @@ def selecionar_campeao(event):
         selecionado = list_campeoes.get(list_campeoes.curselection())
         entry_campeao.delete(0, "end")
         entry_campeao.insert(0, selecionado)
-        # atualizar_lanes(selecionado)
+        atualizar_lanes(selecionado)
     except:
         pass
 
-# def atualizar_lanes(campeao):
-#     lanes = list(counters[campeao].keys())
-#     combo_lane.configure(values=lanes)
-#     combo_lane.set(lanes[0])
+def atualizar_lanes(campeao):
+    lanes = []
+    for item in counters:
+        if item["Campeão"].split("\n")[0] == campeao:  # Comparar os dados do campeão selecionado
+            for counter in item.get("Counters", []): # Procurar no JSON os Counters
+                lane = counter.get("Lane") # e extrair as lanes disponíveis
+                if lane and lane not in lanes:
+                    lanes.append(lane)
+    combo_lane.configure(values=lanes)
+    combo_lane.set(lanes[0] if lanes else "Nenhuma Lane")
 
 # ===== JANELA =====
 app = ctk.CTk()
@@ -169,17 +188,17 @@ list_campeoes.pack(padx=10, pady=(0, 10), fill="x")
 list_campeoes.bind("<<ListboxSelect>>", selecionar_campeao)
 
 # ===== FRAME LANE =====
-# frame_lane = ctk.CTkFrame(app, fg_color=BG_CARD)
-# frame_lane.pack(padx=20, pady=10, fill="x")
+frame_lane = ctk.CTkFrame(app, fg_color=BG_CARD)
+frame_lane.pack(padx=20, pady=10, fill="x")
 
-# combo_lane = ctk.CTkOptionMenu(
-#     frame_lane,
-#     values=[],
-#     fg_color=BG_MAIN,
-#     button_color=BLUE,
-#     text_color=GOLD_LIGHT
-# )
-# combo_lane.pack(padx=10, pady=10, fill="x")
+combo_lane = ctk.CTkOptionMenu(
+    frame_lane,
+    values=[],
+    fg_color=BG_MAIN,
+    button_color=BLUE,
+    text_color=GOLD_LIGHT
+)
+combo_lane.pack(padx=10, pady=10, fill="x")
 
 # ===== BOTÃO =====
 btn_buscar = ctk.CTkButton(
