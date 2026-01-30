@@ -1,1 +1,4 @@
 dist/
+build/
+LOLCounters.spec
+data/
